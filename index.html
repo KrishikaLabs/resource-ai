@@ -2,6 +2,105 @@
 <html>
 <head>
 <title>RE:SOURCE AI</title>
+
+<script type="module">
+import { pipeline }
+from "https://cdn.jsdelivr.net/npm/@huggingface/transformers";
+
+let classifier;
+
+async function startAI() {
+  document.getElementById("status").innerText =
+    "Loading AI...";
+
+  classifier = await pipeline(
+    "zero-shot-image-classification",
+    "Xenova/clip-vit-base-patch32"
+  );
+
+  document.getElementById("status").innerText =
+    "AI ready. Upload an object.";
+}
+
+startAI();
+
+window.analyze = async function() {
+
+  let file = document.getElementById("photo").files[0];
+
+  if (!file) {
+    alert("Please upload a photo first.");
+    return;
+  }
+
+  document.getElementById("status").innerText =
+    "AI is analyzing...";
+
+  let image = URL.createObjectURL(file);
+
+  let result = await classifier(
+    image,
+    {
+      candidate_labels: [
+        "paper",
+        "cardboard",
+        "plastic bottle",
+        "metal can",
+        "electronic device",
+        "glass bottle"
+      ]
+    }
+  );
+
+  let best = result[0];
+
+  document.getElementById("result").innerHTML =
+    "<h2>🤖 AI Analysis</h2>" +
+    "<p><b>Detected:</b> " + best.label + "</p>" +
+    "<p><b>Confidence:</b> " +
+    Math.round(best.score * 100) + "%</p>" +
+    "<p><b>RE:SOURCE Recommendation:</b></p>" +
+    "<p>Identify the material and send it through the appropriate reuse or recycling pathway.</p>";
+
+  document.getElementById("status").innerText =
+    "Analysis complete.";
+};
+</script>
+
+</head>
+
+<body>
+
+<h1>♻️ RE:SOURCE</h1>
+
+<p>AI-Powered Resource Recovery</p>
+
+<h2>Analyze an Object</h2>
+
+<input
+  id="photo"
+  type="file"
+  accept="image/*"
+  capture="environment"
+>
+
+<br><br>
+
+<button onclick="analyze()">
+🤖 Analyze with AI
+</button>
+
+<p id="status">Starting AI...</p>
+
+<div id="result"></div>
+
+</body>
+</html> document.getElementById("result").innerHTML =
+    "<h2>🤖 AI Analysis</h2>" +
+    "<p><b>Detected:</b> " + best.lab<!DOCTYPE html>
+<html>
+<head>
+<title>RE:SOURCE AI</title>
 </head>
 <body>
 
