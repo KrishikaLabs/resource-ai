@@ -1,117 +1,60 @@
 
-    <!DOCTYPE html>
+    
+  
+<!DOCTYPE html>
 <html>
 <head>
 <title>RE:SOURCE AI</title>
-
-<script type="module">
-import { pipeline }
-from "https://cdn.jsdelivr.net/npm/@huggingface/transformers";
-
-let classifier;
-
-async function startAI() {
-  document.getElementById("status").innerText =
-    "Loading AI...";
-
-  classifier = await pipeline(
-    "zero-shot-image-classification",
-    "Xenova/clip-vit-base-patch32
-    <!DOCTYPE html>
-<html>
-<head>
-<title>RE:SOURCE AI</title>
-
-<script type="module">
-import { pipeline }
-from "https://cdn.jsdelivr.net/npm/@huggingface/transformers";
-
-let classifier;
-
-async function startAI() {
-  document.getElementById("status").innerText =
-    "Loading AI...";
-
-  classifier = await pipeline(
-    "zero-shot-image-classification",
-    "Xenova/clip-vit-base-patch32"
-  );
-
-  document.getElementById("status").innerText =
-    "AI ready. Upload an object.";
-}
-
-startAI();
-
-window.analyze = async function() {
-
-  let file = document.getElementById("photo").files[0];
-
-  if (!file) {
-    alert("Please upload a photo first.");
-    return;
-  }
-
-  document.getElementById("status").innerText =
-    "AI is analyzing...";
-
-  let image = URL.createObjectURL(file);
-
-  let result = await classifier(
-    image,
-    {
-      candidate_labels: [
-        "paper",
-        "cardboard",
-        "plastic bottle",
-        "metal can",
-        "electronic device",
-        "glass bottle"
-      ]
-    }
-  );
-
-  let best = result[0];
-
-  document.getElementById("result").innerHTML =
-    "<h2>🤖 AI Analysis</h2>" +
-    "<p><b>Detected:</b> " + best.label + "</p>" +
-    "<p><b>Confidence:</b> " +
-    Math.round(best.score * 100) + "%</p>" +
-    "<p><b>RE:SOURCE Recommendation:</b></p>" +
-    "<p>Identify the material and send it through the appropriate reuse or recycling pathway.</p>";
-
-  document.getElementById("status").innerText =
-    "Analysis complete.";
-};
-</script>
-
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
 </head>
-
 <body>
 
 <h1>♻️ RE:SOURCE</h1>
+<p>AI Resource Recovery</p> 
+    <h2>Analyze an Object</h2>
 
-<p>AI-Powered Resource Recovery</p>
-
-<h2>Analyze an Object</h2>
-
-<input
-  id="photo"
-  type="file"
-  accept="image/*"
-  capture="environment"
->
+<input id="photo" type="file" accept="image/*">
 
 <br><br>
 
-<button onclick="analyze()">
-🤖 Analyze with AI
-</button>
+<img id="preview" width="250">
 
-<p id="status">Starting AI...</p>
+<br><br>
 
-<div id="result"></div>
+<button onclick="analyze()">🤖 Identify with AI</button>
+
+<p id="status">AI is ready.</p>
+
+<h2 id="result"></h2> 
+    <script>
+let model;
+
+mobilenet.load().then(m=>{
+  model=m;
+  status.innerText="AI ready!";
+});
+
+async function analyze(){
+  let f=photo.files[0];
+  if(!f){alert("Upload a photo first!");return;}
+
+  preview.src=URL.createObjectURL(f);
+  status.innerText="AI identifying...";
+
+  preview.onload=async()=>{
+    let r=await model.classify(preview);
+
+    result.innerText=
+      "🤖 AI Identified: "+r[0].className+
+      "\nConfidence: "+Math.round(r[0].probability*100)+"%";
+
+    status.innerText="Analysis complete!";
+  };
+}
+</script>
+
+<p>♻️ RE:SOURCE — Discover resources hidden in discarded objects.</p>
 
 </body>
 </html>
